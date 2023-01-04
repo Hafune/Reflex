@@ -8,19 +8,11 @@ namespace Reflex.Scripts.Extensions
 {
     internal static class ComponentExtensions
     {
-        private static MonoBehaviour[] empty = Array.Empty<MonoBehaviour>();
-        
-        internal static MonoBehaviour[] GetInjectables<T>(this T component, MonoInjectionMode injectionMode) where T : Component
+        internal static IEnumerable<MonoBehaviour> GetInjectables<T>(this T component, MonoInjectionMode injectionMode) where T : Component
         {
             switch (injectionMode)
             {
-                case MonoInjectionMode.Single:
-                {
-                    if (!component.TryGetComponent<MonoBehaviour>(out var mono))
-                        return empty;
-
-                    return new[] { mono };
-                }
+                case MonoInjectionMode.Single: return component.GetComponent<MonoBehaviour>().Yield();
                 case MonoInjectionMode.Object: return component.GetComponents<MonoBehaviour>();
                 case MonoInjectionMode.Recursive: return component.GetComponentsInChildren<MonoBehaviour>(true);
                 default: throw new ArgumentOutOfRangeException(nameof(injectionMode), injectionMode, null);
